@@ -23,7 +23,6 @@ generates:
     persisted-query-ids/server.json:
         - graphql-codegen-persisted-query-ids:
               output: server
-              addTypeName: true # required when using apollo-client
 ```
 
 Run the generator
