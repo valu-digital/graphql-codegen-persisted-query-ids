@@ -30,7 +30,25 @@ Run the generator
     mkdir persisted-query-ids
     ./node_modules/.bin/gql-gen --overwrite
 
-Commit these files to git.
+This will generate two json files. The `server.json` is a query id mapping to
+the actual queries which should be consumed by the server.
+
+Example
+
+```json
+{
+    "093eb2253f63de7afc7c4637bf19273a09591c2139bc068de320ae78e39755d9": "query Thing { field }"
+}
+```
+
+The `client.json` file is an operation name mapping to the query id to be
+consumed by the GraphQL clients.
+
+```json
+{
+    "Thing": "093eb2253f63de7afc7c4637bf19273a09591c2139bc068de320ae78e39755d9"
+}
+```
 
 ### Integrating with WPGraphQL
 
