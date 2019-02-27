@@ -45,7 +45,6 @@ Add my fork of the wp-graphql-persisted-queries plugin
 In your theme's `functions.php` add
 
 ```php
-
 add_filter( 'graphql_persisted_queries_load_query', function( string $query_id ) {
     $queries = json_decode( file_get_contents( __DIR__ . '/persisted-query-ids/server.json' ), true );
     return $queries[ $query_id ] ?? null;
