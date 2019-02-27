@@ -2,9 +2,13 @@
 
 A plugin for graphql-code-generator
 
+## Install
+
 Install graphql-code-generator and this plugin
 
     npm i -D graphql-code-generator graphql-codegen-persisted-query-ids
+
+## Usage
 
 Create codegen.yml
 
@@ -20,3 +24,8 @@ generates:
         - graphql-codegen-persisted-query-ids:
               output: server
 ```
+
+Run the generator
+
+    mkdir persisted-query-ids
+    ./node_modules/.bin/gql-gen --overwrite
