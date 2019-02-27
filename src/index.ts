@@ -5,6 +5,7 @@ import {
     OperationDefinitionNode,
     visit,
     FieldNode,
+    FragmentDefinitionNode,
 } from "graphql";
 import { PluginFunction } from "graphql-codegen-core";
 
@@ -75,6 +76,20 @@ export interface PluginConfig {
     addTypeName?: boolean;
 }
 
+function findUsedFragments(operation: OperationDefinitionNode) {
+    const fragmentNames: string[] = [];
+
+    for (const selection of operation.selectionSet.selections) {
+        if (selection.kind == "FragmentSpread") {
+            if (!fragmentNames.includes(selection.name.value)) {
+                fragmentNames.push(selection.name.value);
+            }
+        }
+    }
+
+    return fragmentNames;
+}
+
 export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
     const out: { [key: string]: string } = {};
 
@@ -83,11 +98,11 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
             doc = addTypenameToDocument(doc);
         }
 
-        let fragments = "";
+        let fragments: FragmentDefinitionNode[] = [];
 
         for (const def of doc.definitions) {
             if (def.kind === "FragmentDefinition") {
-                fragments += print(def) + "\n";
+                fragments.push(def);
             }
 
             if (def.kind === "OperationDefinition") {
@@ -99,7 +114,19 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
                 if (config.output === "client") {
                     out[def.name.value] = hash;
                 } else {
-                    out[hash] = fragments + print(def);
+                    const usedFragments = findUsedFragments(def);
+
+                    const definitions: any[] = [];
+
+                    for (const fragment of fragments) {
+                        if (usedFragments.includes(fragment.name.value)) {
+                            definitions.push(fragment);
+                        }
+                    }
+
+                    definitions.push(def);
+
+                    out[hash] = definitions.map(print).join("\n");
                 }
             }
         }
