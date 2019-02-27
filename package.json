@@ -8,7 +8,7 @@
     },
     "scripts": {
         "test": "echo todo",
-        "build": "tsc --project tsconfig.build.json && rm -rf lib && mv build lib && rm -rf build",
+        "build": "tsc --project tsconfig.build.json && rm -rf lib && mv build/src lib && rm -rf build",
         "clean": "rm -rf lib build",
         "dtslint": "tslint --project tsconfig.dtslint.json",
         "prepublishOnly": "npm run test && npm run build"
