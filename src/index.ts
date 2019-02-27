@@ -83,14 +83,12 @@ export interface PluginConfig {
 }
 
 export function findFragmentSpreadsNames(operation: OperationDefinitionNode) {
-    const fragmentNames: string[] = [];
+    const fragmentNames = new Set<string>();
 
     visit(operation, {
         FragmentSpread: {
             enter(node) {
-                if (!fragmentNames.includes(node.name.value)) {
-                    fragmentNames.push(node.name.value);
-                }
+                fragmentNames.add(node.name.value);
             },
         },
     });
@@ -132,7 +130,7 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
                     const usedFragmentNames = findFragmentSpreadsNames(def);
 
                     const usedFragments = fragments.filter(frag =>
-                        usedFragmentNames.includes(frag.name.value),
+                        usedFragmentNames.has(frag.name.value),
                     );
 
                     const query = printDefinitions([...usedFragments, def]);

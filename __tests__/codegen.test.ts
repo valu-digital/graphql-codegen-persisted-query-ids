@@ -189,5 +189,5 @@ test("can find nested fragment user", () => {
     }
 
     const fragmentNames = findFragmentSpreadsNames(def);
-    expect(fragmentNames).toEqual(["TodoParts"]);
+    expect(fragmentNames).toContain("TodoParts");
 });
