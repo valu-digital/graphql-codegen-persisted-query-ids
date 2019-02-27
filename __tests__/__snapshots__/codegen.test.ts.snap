@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Mutations query ids match from client to server 1`] = `
+"mutation AddTodo($title: String!) {
+  createTodo(input: {title: $title, clientMutationId: \\"lala\\", completed: false, status: PUBLISH}) {
+    clientMutationId
+    todo {
+      id
+      title
+      completed
+    }
+  }
+}"
+`;
+
 exports[`can generate query for simple doc query ids match from client to server 1`] = `
 "query Foo {
   bar

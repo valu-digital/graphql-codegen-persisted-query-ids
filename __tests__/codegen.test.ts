@@ -106,3 +106,39 @@ describe("fragments", () => {
         expect(server[client["Foo2"]]).not.toContain("fragment myFragment");
     });
 });
+
+describe("Mutations", () => {
+    const doc = parse(gql`
+        mutation AddTodo($title: String!) {
+            createTodo(
+                input: {
+                    title: $title
+                    clientMutationId: "lala"
+                    completed: false
+                    status: PUBLISH
+                }
+            ) {
+                clientMutationId
+                todo {
+                    id
+                    title
+                    completed
+                }
+            }
+        }
+    `);
+
+    test("query ids match from client to server", () => {
+        const client = generateQueryIds([doc], {
+            output: "client",
+        });
+
+        const server = generateQueryIds([doc], {
+            output: "server",
+        });
+
+        const query = server[client["AddTodo"]];
+        expect(query).toBeTruthy();
+        expect(query).toMatchSnapshot();
+    });
+});
