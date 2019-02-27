@@ -7,10 +7,9 @@
         "url": "https://github.com/epeli/graphql-codegen-persisted-query-ids"
     },
     "scripts": {
-        "test": "echo todo",
+        "test": "jest",
         "build": "tsc --project tsconfig.build.json && rm -rf lib && mv build/src lib && rm -rf build",
         "clean": "rm -rf lib build",
-        "dtslint": "tslint --project tsconfig.dtslint.json",
         "prepublishOnly": "npm run test && npm run build"
     },
     "devDependencies": {
