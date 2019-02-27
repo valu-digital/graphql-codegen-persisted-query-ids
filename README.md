@@ -22,6 +22,7 @@ generates:
 
     persisted-query-ids/server.json:
         - graphql-codegen-persisted-query-ids:
+              addTypeName: true
               output: server
 ```
 
