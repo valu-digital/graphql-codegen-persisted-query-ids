@@ -82,54 +82,70 @@ export interface PluginConfig {
     output: "server" | "client" | undefined;
 }
 
-function findUsedFragments(operation: OperationDefinitionNode) {
+export function findFragmentSpreadsNames(operation: OperationDefinitionNode) {
     const fragmentNames: string[] = [];
 
-    for (const selection of operation.selectionSet.selections) {
-        if (selection.kind == "FragmentSpread") {
-            if (!fragmentNames.includes(selection.name.value)) {
-                fragmentNames.push(selection.name.value);
-            }
-        }
-    }
+    visit(operation, {
+        FragmentSpread: {
+            enter(node) {
+                if (!fragmentNames.includes(node.name.value)) {
+                    fragmentNames.push(node.name.value);
+                }
+            },
+        },
+    });
 
     return fragmentNames;
 }
 
-function isFragmentDef(def: DefinitionNode): def is FragmentDefinitionNode {
-    return def.kind === "FragmentDefinition";
+export function findFragments(docs: DocumentNode[]) {
+    const fragments: FragmentDefinitionNode[] = [];
+
+    for (const doc of docs) {
+        visit(doc, {
+            FragmentDefinition: {
+                enter(node) {
+                    fragments.push(node);
+                },
+            },
+        });
+    }
+
+    return fragments;
 }
 
 export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
+    docs = docs.map(addTypenameToDocument);
+
     const out: { [key: string]: string } = {};
 
-    for (let doc of docs) {
-        doc = addTypenameToDocument(doc);
+    const fragments = findFragments(docs);
 
-        const fragments = doc.definitions.filter(isFragmentDef);
+    for (const doc of docs) {
+        visit(doc, {
+            OperationDefinition: {
+                enter(def) {
+                    if (!def.name) {
+                        throw new Error("OperationDefinition missing name");
+                    }
 
-        for (const def of doc.definitions) {
-            if (def.kind === "OperationDefinition") {
-                if (!def.name) {
-                    throw new Error("OperationDefinition missing name");
-                }
+                    const usedFragmentNames = findFragmentSpreadsNames(def);
 
-                const usedFragmentNames = findUsedFragments(def);
+                    const usedFragments = fragments.filter(frag =>
+                        usedFragmentNames.includes(frag.name.value),
+                    );
 
-                const usedFragments = fragments.filter(frag =>
-                    usedFragmentNames.includes(frag.name.value),
-                );
+                    const query = printDefinitions([...usedFragments, def]);
+                    const hash = createHash(query);
 
-                const query = printDefinitions([...usedFragments, def]);
-                const hash = createHash(query);
-
-                if (config.output === "client") {
-                    out[def.name.value] = hash;
-                } else {
-                    out[hash] = query;
-                }
-            }
-        }
+                    if (config.output === "client") {
+                        out[def.name.value] = hash;
+                    } else {
+                        out[hash] = query;
+                    }
+                },
+            },
+        });
     }
 
     return out;

@@ -1,5 +1,5 @@
 import { parse } from "graphql";
-import { generateQueryIds } from "../src";
+import { generateQueryIds, findFragmentSpreadsNames } from "../src";
 
 // Nooop gql fn for prettier
 function gql(...things: TemplateStringsArray[]) {
@@ -164,4 +164,30 @@ describe("mutation", () => {
         const query = server[client["AddTodo"]];
         expect(query).toBeTruthy();
     });
+});
+
+test("can find nested fragment user", () => {
+    const doc = parse(gql`
+        query DualTodoList($cursorTodos: String!, $cursorDones: String!) {
+            todos(first: 3, after: $cursorTodos, where: { completed: false }) {
+                ...TodoParts
+            }
+            dones: todos(
+                first: 3
+                after: $cursorDones
+                where: { completed: true }
+            ) {
+                ...TodoParts
+            }
+        }
+    `);
+
+    const def = doc.definitions[0];
+
+    if (def.kind !== "OperationDefinition") {
+        throw new Error("bad type");
+    }
+
+    const fragmentNames = findFragmentSpreadsNames(def);
+    expect(fragmentNames).toEqual(["TodoParts"]);
 });
