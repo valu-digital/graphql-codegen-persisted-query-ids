@@ -9,12 +9,18 @@ import {
 } from "graphql";
 import { PluginFunction } from "graphql-codegen-core";
 
-function createHash(def: any) {
+type Definition = FragmentDefinitionNode | OperationDefinitionNode;
+
+function createHash(s: string) {
     return crypto
         .createHash("sha256")
-        .update(print(def), "utf8")
+        .update(s, "utf8")
         .digest()
         .toString("hex");
+}
+
+function printDefinitions(definitions: Definition[]) {
+    return definitions.map(print).join("\n");
 }
 
 const TYPENAME_FIELD: FieldNode = {
@@ -110,23 +116,25 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
                     throw new Error("OperationDefinition missing name");
                 }
 
-                const hash = createHash(def);
+                const usedFragments = findUsedFragments(def);
+
+                const definitions: Definition[] = [];
+
+                for (const fragment of fragments) {
+                    if (usedFragments.includes(fragment.name.value)) {
+                        definitions.push(fragment);
+                    }
+                }
+
+                definitions.push(def);
+
+                const query = printDefinitions(definitions);
+                const hash = createHash(query);
+
                 if (config.output === "client") {
                     out[def.name.value] = hash;
                 } else {
-                    const usedFragments = findUsedFragments(def);
-
-                    const definitions: any[] = [];
-
-                    for (const fragment of fragments) {
-                        if (usedFragments.includes(fragment.name.value)) {
-                            definitions.push(fragment);
-                        }
-                    }
-
-                    definitions.push(def);
-
-                    out[hash] = definitions.map(print).join("\n");
+                    out[hash] = query;
                 }
             }
         }
