@@ -22,7 +22,7 @@ generates:
 
     persisted-query-ids/server.json:
         - graphql-codegen-persisted-query-ids:
-              addTypeName: true
+              addTypeName: true # required if using apollo-client
               output: server
 ```
 

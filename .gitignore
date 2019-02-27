@@ -1,3 +1,4 @@
 node_modules
-pkg
+/build
+/lib
 package-lock.json
