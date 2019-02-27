@@ -105,6 +105,30 @@ describe("fragments", () => {
         expect(server[client["Foo"]]).toContain("fragment myFragment");
         expect(server[client["Foo2"]]).not.toContain("fragment myFragment");
     });
+
+    test("can use fragment before it's definition", () => {
+        const doc = parse(gql`
+            query Foo {
+                bar
+                ...myFragment
+            }
+
+            fragment myFragment on Ding {
+                name
+            }
+        `);
+
+        const server = generateQueryIds([doc], {
+            output: "server",
+        });
+
+        const client = generateQueryIds([doc], {
+            output: "client",
+        });
+
+        const query = server[client["Foo"]];
+        expect(query).toBeTruthy();
+    });
 });
 
 describe("mutation", () => {

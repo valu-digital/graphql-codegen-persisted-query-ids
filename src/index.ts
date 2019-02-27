@@ -6,6 +6,7 @@ import {
     visit,
     FieldNode,
     FragmentDefinitionNode,
+    DefinitionNode,
 } from "graphql";
 import { PluginFunction } from "graphql-codegen-core";
 
@@ -95,19 +96,19 @@ function findUsedFragments(operation: OperationDefinitionNode) {
     return fragmentNames;
 }
 
+function isFragmentDef(def: DefinitionNode): def is FragmentDefinitionNode {
+    return def.kind === "FragmentDefinition";
+}
+
 export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
     const out: { [key: string]: string } = {};
 
     for (let doc of docs) {
         doc = addTypenameToDocument(doc);
 
-        let fragments: FragmentDefinitionNode[] = [];
+        const fragments = doc.definitions.filter(isFragmentDef);
 
         for (const def of doc.definitions) {
-            if (def.kind === "FragmentDefinition") {
-                fragments.push(def);
-            }
-
             if (def.kind === "OperationDefinition") {
                 if (!def.name) {
                     throw new Error("OperationDefinition missing name");
