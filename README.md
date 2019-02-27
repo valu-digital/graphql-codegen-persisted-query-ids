@@ -68,7 +68,9 @@ add_filter( 'graphql_persisted_queries_load_query', function( string $query_id )
 }, 10, 1 );
 ```
 
-Pro tip: You can enable the lock mode using this.
+Pro tip: You can enable the [lock mode][lock] using this.
+
+[lock]: https://github.com/epeli/wp-graphql-persisted-queries#lock-mode
 
 ### Integrating with Apollo Client
 
