@@ -19,7 +19,7 @@ function createHash(s: string) {
         .toString("hex");
 }
 
-function printDefinitions(definitions: Definition[]) {
+function printDefinitions(definitions: (Definition | DocumentNode)[]) {
     return definitions.map(print).join("\n");
 }
 
@@ -79,7 +79,6 @@ function addTypenameToDocument(doc: DocumentNode): DocumentNode {
 
 export interface PluginConfig {
     output: "server" | "client" | undefined;
-    addTypeName?: boolean;
 }
 
 function findUsedFragments(operation: OperationDefinitionNode) {
@@ -100,9 +99,7 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
     const out: { [key: string]: string } = {};
 
     for (let doc of docs) {
-        if (config.addTypeName) {
-            doc = addTypenameToDocument(doc);
-        }
+        doc = addTypenameToDocument(doc);
 
         let fragments: FragmentDefinitionNode[] = [];
 
@@ -116,19 +113,13 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
                     throw new Error("OperationDefinition missing name");
                 }
 
-                const usedFragments = findUsedFragments(def);
+                const usedFragmentNames = findUsedFragments(def);
 
-                const definitions: Definition[] = [];
+                const usedFragments = fragments.filter(frag =>
+                    usedFragmentNames.includes(frag.name.value),
+                );
 
-                for (const fragment of fragments) {
-                    if (usedFragments.includes(fragment.name.value)) {
-                        definitions.push(fragment);
-                    }
-                }
-
-                definitions.push(def);
-
-                const query = printDefinitions(definitions);
+                const query = printDefinitions([...usedFragments, def]);
                 const hash = createHash(query);
 
                 if (config.output === "client") {

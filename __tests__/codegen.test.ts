@@ -107,7 +107,7 @@ describe("fragments", () => {
     });
 });
 
-describe("Mutations", () => {
+describe("mutation", () => {
     const doc = parse(gql`
         mutation AddTodo($title: String!) {
             createTodo(
@@ -139,6 +139,5 @@ describe("Mutations", () => {
 
         const query = server[client["AddTodo"]];
         expect(query).toBeTruthy();
-        expect(query).toMatchSnapshot();
     });
 });
