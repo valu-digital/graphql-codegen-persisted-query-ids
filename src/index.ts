@@ -75,28 +75,17 @@ export interface PluginConfig {
     addTypeName?: boolean;
 }
 
-export const plugin: PluginFunction<PluginConfig> = (
-    schema,
-    documents,
-    config,
-) => {
-    if (config.output !== "client" && config.output !== "server") {
-        throw new Error(
-            "graphql-codegen-persisted-query-id must configure output to 'server' or 'client'",
-        );
-    }
+export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
+    const out: { [key: string]: string } = {};
 
-    const clientOutput: { [operationName: string]: string } = {};
-    const serverOutput: { [hash: string]: string } = {};
+    for (let doc of docs) {
+        if (config.addTypeName) {
+            doc = addTypenameToDocument(doc);
+        }
 
-    for (const doc of documents) {
         let fragments = "";
 
-        const content = config.addTypeName
-            ? addTypenameToDocument(doc.content)
-            : doc.content;
-
-        for (const def of content.definitions) {
+        for (const def of doc.definitions) {
             if (def.kind === "FragmentDefinition") {
                 fragments += print(def) + "\n";
             }
@@ -107,12 +96,30 @@ export const plugin: PluginFunction<PluginConfig> = (
                 }
 
                 const hash = createHash(def);
-                clientOutput[def.name.value] = hash;
-                serverOutput[hash] = fragments + print(def);
+                if (config.output === "client") {
+                    out[def.name.value] = hash;
+                } else {
+                    out[hash] = fragments + print(def);
+                }
             }
         }
     }
 
-    const out = config.output === "server" ? serverOutput : clientOutput;
+    return out;
+}
+
+export const plugin: PluginFunction<PluginConfig> = (
+    _schema,
+    documents,
+    config,
+) => {
+    if (config.output !== "client" && config.output !== "server") {
+        throw new Error(
+            "graphql-codegen-persisted-query-id must configure output to 'server' or 'client'",
+        );
+    }
+
+    const out = generateQueryIds(documents.map(doc => doc.content), config);
+
     return JSON.stringify(out, null, "   ");
 };

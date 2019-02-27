@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can generate query for simple doc query ids match from client to server 1`] = `
+"query Foo {
+  bar
+}"
+`;
+
+exports[`can generate query for simple doc server 1`] = `
+Object {
+  "5430c050ffd840248a6724bb3a674ffb347dce047429ba5bf61a9edee3d8d699": "query Foo {
+  bar
+}",
+}
+`;
