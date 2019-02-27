@@ -68,13 +68,7 @@ add_filter( 'graphql_persisted_queries_load_query', function( string $query_id )
 }, 10, 1 );
 ```
 
-You can progmatically manage the lock mode with the option filter
-
-```php
-add_filter( 'option_graphql_persisted_queries_is_locked', function() {
-    return defined( 'WP_ENV' ) && 'production' ===  WP_ENV;
-}, 10 , 1 );
-```
+Pro tip: You can enable the lock mode using this.
 
 ### Integrating with Apollo Client
 
@@ -84,7 +78,7 @@ Add custom `generateHash` to [apollo-link-persisted-queries](https://github.com/
 import { createPersistedQueryLink } from "apollo-link-persisted-queries";
 import { usePregeneratedHashes } from "graphql-codegen-persisted-query-ids/lib/apollo";
 
-const hashes = require("../persisted-query-ids/client");
+const hashes = require("../persisted-query-ids/client.json");
 
 const persistedLink = createPersistedQueryLink({
     useGETForHashedQueries: true, // Optional but allows better caching
