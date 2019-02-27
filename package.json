@@ -1,0 +1,38 @@
+{
+    "name": "graphql-codegen-persisted-query-ids",
+    "version": "0.0.1",
+    "description": "Generate persisted query ids",
+    "main": "src/index.ts",
+    "repository": {
+        "url": "https://github.com/epeli/graphql-codegen-persisted-query-ids"
+    },
+    "@pika/pack": {
+        "pipeline": [
+            [
+                "@pika/plugin-standard-pkg"
+            ],
+            [
+                "@pika/plugin-build-node",
+                {
+                    "minNodeVersion": 8
+                }
+            ],
+            [
+                "@pika/plugin-build-types"
+            ]
+        ]
+    },
+    "devDependencies": {
+        "@pika/pack": "^0.3.3",
+        "@pika/plugin-build-node": "^0.3.12",
+        "@pika/plugin-build-types": "^0.3.12",
+        "@pika/plugin-standard-pkg": "^0.3.12",
+        "@types/graphql": "^14.0.7",
+        "@types/node": "^11.9.5",
+        "prettier": "^1.16.4"
+    },
+    "dependencies": {
+        "graphql": "^14.1.1",
+        "graphql-codegen-core": "^0.17.0"
+    }
+}
