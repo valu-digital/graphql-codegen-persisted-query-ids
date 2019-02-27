@@ -65,13 +65,13 @@ Add custom `generateHash` to [apollo-link-persisted-queries](https://github.com/
 
 ```ts
 import { createPersistedQueryLink } from "apollo-link-persisted-queries";
-import { usePregeneratedHashed } from "graphql-codegen-persisted-query-ids/lib/apollo";
+import { usePregeneratedHashes } from "graphql-codegen-persisted-query-ids/lib/apollo";
 
 const hashes = require("../persisted-query-ids/client");
 
 const persistedLink = createPersistedQueryLink({
     useGETForHashedQueries: true, // Optional but allows better caching
-    generateHash: usePregeneratedHashed(hashes),
+    generateHash: usePregeneratedHashes(hashes),
 });
 
 // And pass it to ApolloClient

@@ -1,4 +1,4 @@
-export function usePregeneratedHashed(hashes: {
+export function usePregeneratedHashes(hashes: {
     [operationsName: string]: string | undefined;
 }) {
     return (doc: import("graphql").DocumentNode) => {
