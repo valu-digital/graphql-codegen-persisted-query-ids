@@ -78,7 +78,7 @@ describe("fragments", () => {
             output: "client",
         });
 
-        expect(server[client["Foo"]]).toContain("myFragment");
+        expect(server[client["Foo"]]).toContain("fragment myFragment");
     });
 
     test("multiple docs not using fragments", () => {
@@ -90,7 +90,7 @@ describe("fragments", () => {
             output: "client",
         });
 
-        expect(server[client["Foo2"]]).not.toContain("myFragment");
+        expect(server[client["Foo2"]]).not.toContain("fragment myFragment");
     });
 
     test("multi query doc", () => {
@@ -102,7 +102,7 @@ describe("fragments", () => {
             output: "client",
         });
 
-        expect(server[client["Foo"]]).toContain("myFragment");
-        expect(server[client["Foo2"]]).not.toContain("myFragment");
+        expect(server[client["Foo"]]).toContain("fragment myFragment");
+        expect(server[client["Foo2"]]).not.toContain("fragment myFragment");
     });
 });
