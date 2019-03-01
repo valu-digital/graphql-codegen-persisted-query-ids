@@ -82,28 +82,40 @@ export interface PluginConfig {
     output: "server" | "client" | undefined;
 }
 
-export function findFragmentSpreadsNames(operation: OperationDefinitionNode) {
-    const fragmentNames = new Set<string>();
+export function findUsedFragments(
+    operation: OperationDefinitionNode | FragmentDefinitionNode,
+    knownFragments: ReadonlyMap<string, FragmentDefinitionNode>,
+    _usedFragments?: Map<string, FragmentDefinitionNode>,
+) {
+    const usedFragments = _usedFragments
+        ? _usedFragments
+        : new Map<string, FragmentDefinitionNode>();
 
     visit(operation, {
         FragmentSpread: {
             enter(node) {
-                fragmentNames.add(node.name.value);
+                const frag = knownFragments.get(node.name.value);
+                if (frag) {
+                    usedFragments.set(node.name.value, frag);
+                    findUsedFragments(frag, knownFragments, usedFragments);
+                } else {
+                    throw new Error("Unknown fragment: " + node.name.value);
+                }
             },
         },
     });
 
-    return fragmentNames;
+    return usedFragments;
 }
 
-export function findFragments(docs: DocumentNode[]) {
-    const fragments: FragmentDefinitionNode[] = [];
+export function findFragments(docs: (DocumentNode | FragmentDefinitionNode)[]) {
+    const fragments = new Map<string, FragmentDefinitionNode>();
 
     for (const doc of docs) {
         visit(doc, {
             FragmentDefinition: {
                 enter(node) {
-                    fragments.push(node);
+                    fragments.set(node.name.value, node);
                 },
             },
         });
@@ -117,7 +129,7 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
 
     const out: { [key: string]: string } = {};
 
-    const fragments = findFragments(docs);
+    const knownFragments = findFragments(docs);
 
     for (const doc of docs) {
         visit(doc, {
@@ -127,13 +139,15 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
                         throw new Error("OperationDefinition missing name");
                     }
 
-                    const usedFragmentNames = findFragmentSpreadsNames(def);
-
-                    const usedFragments = fragments.filter(frag =>
-                        usedFragmentNames.has(frag.name.value),
+                    const usedFragments = findUsedFragments(
+                        def,
+                        knownFragments,
                     );
 
-                    const query = printDefinitions([...usedFragments, def]);
+                    const query = printDefinitions([
+                        ...Array.from(usedFragments.values()),
+                        def,
+                    ]);
                     const hash = createHash(query);
 
                     if (config.output === "client") {

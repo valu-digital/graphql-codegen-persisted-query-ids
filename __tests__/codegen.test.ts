@@ -1,5 +1,5 @@
 import { parse } from "graphql";
-import { generateQueryIds, findFragmentSpreadsNames } from "../src";
+import { generateQueryIds, findUsedFragments, findFragments } from "../src";
 
 // Nooop gql fn for prettier
 function gql(...things: TemplateStringsArray[]) {
@@ -129,6 +129,37 @@ describe("fragments", () => {
         const query = server[client["Foo"]];
         expect(query).toBeTruthy();
     });
+
+    test("fragments in fragments work", () => {
+        const fragInFrag = parse(gql`
+            fragment nestedFrag on Ding {
+                fromNested
+            }
+
+            fragment myFragment on Ding {
+                name
+                ...nestedFrag
+            }
+
+            query Foo {
+                bar
+                ...myFragment
+            }
+        `);
+
+        const server = generateQueryIds([fragInFrag], {
+            output: "server",
+        });
+
+        const client = generateQueryIds([fragInFrag], {
+            output: "client",
+        });
+
+        const query = server[client["Foo"]];
+        expect(query).toBeTruthy();
+        expect(query).toContain("fragment nestedFrag");
+        expect(query).toContain("fragment myFragment");
+    });
 });
 
 describe("mutation", () => {
@@ -168,6 +199,10 @@ describe("mutation", () => {
 
 test("can find nested fragment user", () => {
     const doc = parse(gql`
+        fragment TodoParts on Todo {
+            title
+        }
+
         query DualTodoList($cursorTodos: String!, $cursorDones: String!) {
             todos(first: 3, after: $cursorTodos, where: { completed: false }) {
                 ...TodoParts
@@ -182,12 +217,19 @@ test("can find nested fragment user", () => {
         }
     `);
 
-    const def = doc.definitions[0];
+    const operation = doc.definitions.find(
+        def => def.kind === "OperationDefinition",
+    );
 
-    if (def.kind !== "OperationDefinition") {
-        throw new Error("bad type");
+    if (!operation || operation.kind !== "OperationDefinition") {
+        throw new Error("cannot find operation");
     }
 
-    const fragmentNames = findFragmentSpreadsNames(def);
-    expect(fragmentNames).toContain("TodoParts");
+    const knownFragments = findFragments([doc]);
+
+    const fragmentNames = Array.from(
+        findUsedFragments(operation, knownFragments).values(),
+    ).map(frag => frag.name.value);
+
+    expect(fragmentNames).toEqual(["TodoParts"]);
 });
