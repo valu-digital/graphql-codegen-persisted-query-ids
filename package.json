@@ -1,6 +1,6 @@
 {
     "name": "graphql-codegen-persisted-query-ids",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Generate persisted query ids",
     "main": "lib/index.js",
     "repository": {
