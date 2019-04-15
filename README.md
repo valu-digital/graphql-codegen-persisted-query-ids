@@ -62,10 +62,11 @@ Add my fork of the wp-graphql-persisted-queries plugin
 In your theme's `functions.php` add
 
 ```php
-add_filter( 'graphql_persisted_queries_load_query', function( string $query_id ) {
-    $queries = json_decode( file_get_contents( __DIR__ . '/persisted-query-ids/server.json' ), true );
+add_filter( 'graphql_persisted_queries_load_query', function( $queries, string $query_id ) {
+    $queries = json_decode( file_get_contents( __DIR__ . '/../persisted-query-ids/server.json' ), true );
     return $queries[ $query_id ] ?? null;
-}, 10, 1 );
+}, 10, 2 );
+
 ```
 
 Pro tip: You can enable the [lock mode][lock] using this.
