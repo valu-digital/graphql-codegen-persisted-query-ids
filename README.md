@@ -52,26 +52,22 @@ consumed by the GraphQL clients.
 
 ### Integrating with WPGraphQL
 
-Add my fork of the wp-graphql-persisted-queries plugin
+Use the [wp-graphql-lock][] plugin
 
     cd wp-content/plugins
-    git clone https://github.com/epeli/wp-graphql-persisted-queries
+    git clone https://github.com/valu-digital/wp-graphql-lock
 
-> The fork is required for now but I've sent the changes as PRs to the upstream
+[wp-graphql-lock]: https://github.com/valu-digital/wp-graphql-lock
 
 In your theme's `functions.php` add
 
 ```php
-add_filter( 'graphql_persisted_queries_load_query', function( $queries, string $query_id ) {
+add_filter( 'graphql_lock_load_query', function( $queries, string $query_id ) {
     $queries = json_decode( file_get_contents( __DIR__ . '/../persisted-query-ids/server.json' ), true );
     return $queries[ $query_id ] ?? null;
 }, 10, 2 );
 
 ```
-
-Pro tip: You can enable the [lock mode][lock] using this.
-
-[lock]: https://github.com/epeli/wp-graphql-persisted-queries#lock-mode
 
 ### Integrating with Apollo Client
 
