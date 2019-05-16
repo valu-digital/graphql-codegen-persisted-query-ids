@@ -62,7 +62,7 @@ Use the [wp-graphql-lock][] plugin
 In your theme's `functions.php` add
 
 ```php
-add_filter( 'graphql_lock_load_query', function( $queries, string $query_id ) {
+add_filter( 'graphql_lock_load_query', function( string $query, string $query_id ) {
     $queries = json_decode( file_get_contents( __DIR__ . '/../persisted-query-ids/server.json' ), true );
     return $queries[ $query_id ] ?? null;
 }, 10, 2 );
