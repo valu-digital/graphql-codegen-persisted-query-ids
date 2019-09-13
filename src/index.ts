@@ -8,7 +8,8 @@ import {
     FragmentDefinitionNode,
     DefinitionNode,
 } from "graphql";
-import { PluginFunction } from "graphql-codegen-core";
+
+import { PluginFunction } from "@graphql-codegen/plugin-helpers";
 
 type Definition = FragmentDefinitionNode | OperationDefinitionNode;
 

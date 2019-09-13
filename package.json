@@ -13,16 +13,16 @@
         "prepublishOnly": "npm run test && npm run build"
     },
     "devDependencies": {
-        "@types/graphql": "^14.0.7",
-        "@types/jest": "^24.0.9",
-        "@types/node": "^11.9.5",
-        "jest": "^24.1.0",
-        "prettier": "^1.16.4",
-        "ts-jest": "^24.0.0",
-        "typescript": "^3.3.3333"
+        "@types/graphql": "^14.5.0",
+        "@types/jest": "^24.0.18",
+        "@types/node": "^12.7.5",
+        "jest": "^24.9.0",
+        "prettier": "^1.18.2",
+        "ts-jest": "^24.1.0",
+        "typescript": "^3.6.3"
     },
     "dependencies": {
-        "graphql": "^14.1.1",
-        "graphql-codegen-core": "^0.17.0"
+        "@graphql-codegen/plugin-helpers": "^1.7.0",
+        "graphql": "^14.5.4"
     }
 }
