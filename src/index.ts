@@ -125,10 +125,16 @@ export function findFragments(docs: (DocumentNode | FragmentDefinitionNode)[]) {
     return fragments;
 }
 
-export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
+export function generateQueryIds(docs: DocumentNode[]) {
     docs = docs.map(addTypenameToDocument);
 
-    const out: { [key: string]: string } = {};
+    const out: {
+        [queryName: string]: {
+            hash: string;
+            query: string;
+            usesVariables: boolean;
+        };
+    } = {};
 
     const knownFragments = findFragments(docs);
 
@@ -151,11 +157,11 @@ export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
                     ]);
                     const hash = createHash(query);
 
-                    if (config.output === "client") {
-                        out[def.name.value] = hash;
-                    } else {
-                        out[hash] = query;
-                    }
+                    out[def.name.value] = {
+                        hash,
+                        query,
+                        usesVariables: false,
+                    };
                 },
             },
         });
@@ -169,13 +175,23 @@ export const plugin: PluginFunction<PluginConfig> = (
     documents,
     config,
 ) => {
-    if (config.output !== "client" && config.output !== "server") {
+    const queries = generateQueryIds(documents.map(doc => doc.content));
+
+    const out: Record<string, string> = {};
+
+    if (config.output === "client") {
+        for (const queryName of Object.keys(queries)) {
+            out[queryName] = queries[queryName].hash;
+        }
+    } else if (config.output === "server") {
+        for (const queryName of Object.keys(queries)) {
+            out[queries[queryName].hash] = queries[queryName].query;
+        }
+    } else {
         throw new Error(
             "graphql-codegen-persisted-query-id must configure output to 'server' or 'client'",
         );
     }
-
-    const out = generateQueryIds(documents.map(doc => doc.content), config);
 
     return JSON.stringify(out, null, "   ");
 };
