@@ -254,3 +254,37 @@ describe("can generate query for simple doc", () => {
         expect(fragmentNames).toEqual(["TodoParts"]);
     });
 });
+
+describe("can extract variable info", () => {
+    const doc1 = parse(gql`
+        query Foo {
+            bar
+        }
+    `);
+
+    const doc2 = parse(gql`
+        query Foo($foo: String) {
+            bar
+        }
+    `);
+
+    test("does not use variables", async () => {
+        const client = generateQueryIds([doc1]);
+
+        expect(client["Foo"]).toMatchObject({
+            hash: expect.stringMatching(/.+/),
+            query: expect.stringContaining("query Foo"),
+            usesVariables: false,
+        });
+    });
+
+    test("does use variables", async () => {
+        const client = generateQueryIds([doc2]);
+
+        expect(client["Foo"]).toMatchObject({
+            hash: expect.stringMatching(/.+/),
+            query: expect.stringContaining("query Foo"),
+            usesVariables: true,
+        });
+    });
+});

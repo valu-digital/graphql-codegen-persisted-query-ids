@@ -155,12 +155,18 @@ export function generateQueryIds(docs: DocumentNode[]) {
                         ...Array.from(usedFragments.values()),
                         def,
                     ]);
+
                     const hash = createHash(query);
+
+                    const usesVariables = Boolean(
+                        def.variableDefinitions &&
+                            def.variableDefinitions.length > 0,
+                    );
 
                     out[def.name.value] = {
                         hash,
                         query,
-                        usesVariables: false,
+                        usesVariables,
                     };
                 },
             },
