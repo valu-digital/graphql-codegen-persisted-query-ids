@@ -176,6 +176,25 @@ export function generateQueryIds(docs: DocumentNode[]) {
     return out;
 }
 
+export const format = {
+    server(queries: ReturnType<typeof generateQueryIds>) {
+        const out: Record<string, string> = {};
+        for (const queryName of Object.keys(queries)) {
+            out[queries[queryName].hash] = queries[queryName].query;
+        }
+
+        return out;
+    },
+
+    client(queries: ReturnType<typeof generateQueryIds>) {
+        const out: Record<string, string> = {};
+        for (const queryName of Object.keys(queries)) {
+            out[queryName] = queries[queryName].hash;
+        }
+        return out;
+    },
+};
+
 export const plugin: PluginFunction<PluginConfig> = (
     _schema,
     documents,
@@ -183,16 +202,12 @@ export const plugin: PluginFunction<PluginConfig> = (
 ) => {
     const queries = generateQueryIds(documents.map(doc => doc.content));
 
-    const out: Record<string, string> = {};
+    let out: Record<string, string> = {};
 
     if (config.output === "client") {
-        for (const queryName of Object.keys(queries)) {
-            out[queryName] = queries[queryName].hash;
-        }
+        out = format.client(queries);
     } else if (config.output === "server") {
-        for (const queryName of Object.keys(queries)) {
-            out[queries[queryName].hash] = queries[queryName].query;
-        }
+        out = format.server(queries);
     } else {
         throw new Error(
             "graphql-codegen-persisted-query-id must configure output to 'server' or 'client'",
