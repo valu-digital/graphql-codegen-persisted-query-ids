@@ -6,7 +6,7 @@ import {
     visit,
     FieldNode,
     FragmentDefinitionNode,
-    DefinitionNode,
+    Location,
 } from "graphql";
 
 import { PluginFunction } from "@graphql-codegen/plugin-helpers";
@@ -133,6 +133,7 @@ export function generateQueryIds(docs: DocumentNode[]) {
             hash: string;
             query: string;
             usesVariables: boolean;
+            loc?: Location;
         };
     } = {};
 
@@ -167,6 +168,7 @@ export function generateQueryIds(docs: DocumentNode[]) {
                         hash,
                         query,
                         usesVariables,
+                        loc: doc.loc,
                     };
                 },
             },
