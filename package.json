@@ -24,5 +24,8 @@
     "dependencies": {
         "@graphql-codegen/plugin-helpers": "1.7.x",
         "graphql": "^14.5.4"
-    }
+    },
+    "files": [
+        "lib"
+    ]
 }
