@@ -22,7 +22,7 @@
         "typescript": "^3.6.3"
     },
     "dependencies": {
-        "@graphql-codegen/plugin-helpers": "^1.7.0",
+        "@graphql-codegen/plugin-helpers": "1.7.x",
         "graphql": "^14.5.4"
     }
 }

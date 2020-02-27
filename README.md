@@ -19,10 +19,12 @@ generates:
     persisted-query-ids/client.json:
         - graphql-codegen-persisted-query-ids:
               output: client
+              algorithm: sha256
 
     persisted-query-ids/server.json:
         - graphql-codegen-persisted-query-ids:
               output: server
+              algorithm: sha256
 ```
 
 Run the generator

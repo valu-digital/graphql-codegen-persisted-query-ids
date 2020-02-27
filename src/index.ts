@@ -13,9 +13,9 @@ import { PluginFunction } from "@graphql-codegen/plugin-helpers";
 
 type Definition = FragmentDefinitionNode | OperationDefinitionNode;
 
-function createHash(s: string) {
+function createHash(s: string, config: PluginConfig) {
     return crypto
-        .createHash("sha256")
+        .createHash(config.algorithm || "sha256")
         .update(s, "utf8")
         .digest()
         .toString("hex");
@@ -81,6 +81,7 @@ function addTypenameToDocument(doc: DocumentNode): DocumentNode {
 
 export interface PluginConfig {
     output: "server" | "client" | undefined;
+    algorithm?: string;
 }
 
 export function findUsedFragments(
@@ -125,7 +126,7 @@ export function findFragments(docs: (DocumentNode | FragmentDefinitionNode)[]) {
     return fragments;
 }
 
-export function generateQueryIds(docs: DocumentNode[]) {
+export function generateQueryIds(docs: DocumentNode[], config: PluginConfig) {
     docs = docs.map(addTypenameToDocument);
 
     const out: {
@@ -157,7 +158,7 @@ export function generateQueryIds(docs: DocumentNode[]) {
                         def,
                     ]);
 
-                    const hash = createHash(query);
+                    const hash = createHash(query, config);
 
                     const usesVariables = Boolean(
                         def.variableDefinitions &&
@@ -202,7 +203,10 @@ export const plugin: PluginFunction<PluginConfig> = (
     documents,
     config,
 ) => {
-    const queries = generateQueryIds(documents.map(doc => doc.content));
+    const queries = generateQueryIds(
+        documents.map(doc => doc.content),
+        config,
+    );
 
     let out: Record<string, string> = {};
 
