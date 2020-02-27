@@ -1,4 +1,4 @@
-import { parse, DocumentNode } from "graphql";
+import { parse } from "graphql";
 import {
     generateQueryIds,
     findUsedFragments,
@@ -269,7 +269,7 @@ describe("can extract variable info", () => {
     `);
 
     test("does not use variables", async () => {
-        const client = generateQueryIds([doc1]);
+        const client = generateQueryIds([doc1], { output: "client" });
 
         expect(client["Foo"]).toMatchObject({
             hash: expect.stringMatching(/.+/),
@@ -279,7 +279,7 @@ describe("can extract variable info", () => {
     });
 
     test("does use variables", async () => {
-        const client = generateQueryIds([doc2]);
+        const client = generateQueryIds([doc2], { output: "client" });
 
         expect(client["Foo"]).toMatchObject({
             hash: expect.stringMatching(/.+/),
