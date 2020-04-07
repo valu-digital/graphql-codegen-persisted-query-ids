@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "@graphql-codegen/plugin-helpers": "^1.13.2",
-        "graphql": "^15.0.0"
+        "graphql": "^14.0.0"
     },
     "files": [
         "lib"
