@@ -204,7 +204,15 @@ export const plugin: PluginFunction<PluginConfig> = (
     config,
 ) => {
     const queries = generateQueryIds(
-        documents.map(doc => doc.content || doc.document),
+        documents.map(doc => {
+            // graphql-code-generator moved from .content to .document at some point.
+            // Try to work with both. Must use any since the tests can only have
+            // one version of the typings
+            const anyDoc = doc as any;
+            const docNode: DocumentNode = anyDoc.content || anyDoc.document;
+
+            return docNode;
+        }),
         config,
     );
 
