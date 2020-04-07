@@ -1,6 +1,6 @@
 {
     "extends": "./tsconfig.json",
-    "exclude": ["__dtslint__"],
+    "exclude": ["__dtslint__", "build"],
     "compilerOptions": {
         "sourceMap": true,
         "noEmit": false,
