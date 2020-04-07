@@ -204,7 +204,7 @@ export const plugin: PluginFunction<PluginConfig> = (
     config,
 ) => {
     const queries = generateQueryIds(
-        documents.map(doc => doc.content || doc.document),
+        documents.map(doc => doc.content),
         config,
     );
 
