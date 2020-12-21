@@ -76,7 +76,8 @@ add_filter( 'graphql_lock_load_query', function( string $query, string $query_id
 Add custom `generateHash` to [apollo-link-persisted-queries](https://github.com/apollographql/apollo-link-persisted-queries)
 
 ```ts
-import { createPersistedQueryLink } from "apollo-link-persisted-queries";
+import { createPersistedQueryLink } from "@apollo/client/link/persisted-queries";
+// import {createPersistedQueryLink } from "apollo-link-persisted-queries"; // For Apollo Client v2
 import { usePregeneratedHashes } from "graphql-codegen-persisted-query-ids/lib/apollo";
 
 const hashes = require("../persisted-query-ids/client.json");
