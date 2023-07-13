@@ -10,7 +10,8 @@
         "test": "jest",
         "build": "tsc --project tsconfig.build.json && rm -rf lib && mv build/src lib && rm -rf build",
         "clean": "rm -rf lib build",
-        "prepublishOnly": "npm run test && npm run build"
+        "prepublishOnly": "npm run test && npm run build",
+        "dev": "npm run build && graphql-codegen --config ./dev/codegen.yml"
     },
     "devDependencies": {
         "@types/jest": "^25.2.1",
@@ -21,7 +22,6 @@
         "typescript": "^5.1.6"
     },
     "dependencies": {
-        "@graphql-codegen/cli": "^4.0.1",
         "@graphql-codegen/plugin-helpers": "^5.0.0",
         "@graphql-tools/apollo-engine-loader": "^8.0.0",
         "graphql": "^16.7.1"
