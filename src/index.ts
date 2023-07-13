@@ -7,6 +7,7 @@ import {
     FieldNode,
     FragmentDefinitionNode,
     Location,
+    Kind,
 } from "graphql";
 
 import { PluginFunction } from "@graphql-codegen/plugin-helpers";
@@ -26,9 +27,9 @@ function printDefinitions(definitions: (Definition | DocumentNode)[]) {
 }
 
 const TYPENAME_FIELD: FieldNode = {
-    kind: "Field",
+    kind: Kind.FIELD,
     name: {
-        kind: "Name",
+        kind: Kind.NAME,
         value: "__typename",
     },
 };
@@ -55,7 +56,7 @@ function addTypenameToDocument(doc: DocumentNode): DocumentNode {
 
                 // If selections already have a __typename, or are part of an
                 // introspection query, do nothing.
-                const skip = selections.some(selection => {
+                const skip = selections.some((selection) => {
                     return (
                         selection.kind === "Field" &&
                         ((selection as FieldNode).name.value === "__typename" ||
@@ -198,19 +199,18 @@ export const format = {
     },
 };
 
-export const plugin: PluginFunction<PluginConfig> = (
+export const plugin: PluginFunction<PluginConfig, string> = (
     _schema,
     documents,
     config,
 ) => {
     const queries = generateQueryIds(
-        documents.map(doc => {
+        documents.map((doc) => {
             // graphql-code-generator moved from .content to .document at some point.
             // Try to work with both. Must use any since the tests can only have
             // one version of the typings
             const anyDoc = doc as any;
             const docNode: DocumentNode = anyDoc.content || anyDoc.document;
-
             return docNode;
         }),
         config,

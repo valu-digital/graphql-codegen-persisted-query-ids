@@ -1,4 +1,4 @@
-import { parse } from "graphql";
+import { DocumentNode, parse } from "graphql";
 import {
     generateQueryIds,
     findUsedFragments,
@@ -6,6 +6,7 @@ import {
     plugin,
     PluginConfig,
 } from "../src";
+import { Types } from "@graphql-codegen/plugin-helpers";
 
 const SCHEMA = {} as any;
 
@@ -14,13 +15,12 @@ function gql(...things: TemplateStringsArray[]) {
     return things.join("");
 }
 
-function runPlugin(docs: any, config: PluginConfig): any {
-    const documents = docs.map((doc: any) => ({
+function runPlugin(docs: DocumentNode[], config: PluginConfig): any {
+    const documents: Types.DocumentFile[] = docs.map((doc) => ({
         filePath: "",
-        content: doc,
+        document: doc,
     }));
-
-    return JSON.parse((plugin as any)(SCHEMA, documents, config));
+    return JSON.parse(plugin(SCHEMA, documents, config) as string);
 }
 
 describe("can generate query for simple doc", () => {
@@ -238,7 +238,7 @@ describe("can generate query for simple doc", () => {
         `);
 
         const operation = doc.definitions.find(
-            def => def.kind === "OperationDefinition",
+            (def) => def.kind === "OperationDefinition",
         );
 
         if (!operation || operation.kind !== "OperationDefinition") {
@@ -249,7 +249,7 @@ describe("can generate query for simple doc", () => {
 
         const fragmentNames = Array.from(
             findUsedFragments(operation, knownFragments).values(),
-        ).map(frag => frag.name.value);
+        ).map((frag) => frag.name.value);
 
         expect(fragmentNames).toEqual(["TodoParts"]);
     });
