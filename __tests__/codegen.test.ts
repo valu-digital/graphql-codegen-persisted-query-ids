@@ -1,4 +1,4 @@
-import { DocumentNode, buildSchema, parse } from "graphql";
+import { DocumentNode, parse } from "graphql";
 import {
     generateQueryIds,
     findUsedFragments,
