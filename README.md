@@ -6,15 +6,15 @@ A plugin for graphql-code-generator
 
 Install graphql-code-generator and this plugin
 
-    npm i -D graphql-code-generator graphql-codegen-persisted-query-ids
+    npm i -D graphql @graphql-codegen/cli graphql-codegen-persisted-query-ids
 
 ## Usage
 
 Create codegen.yml
 
 ```yaml
-schema: http://app.test/graphql
-documents: "./src/**/*.js"
+schema: http://localhost:5000/graphql
+documents: "./src/**/*.ts"
 generates:
     persisted-query-ids/client.json:
         - graphql-codegen-persisted-query-ids:
@@ -30,7 +30,7 @@ generates:
 Run the generator
 
     mkdir persisted-query-ids
-    ./node_modules/.bin/gql-gen --overwrite
+    npx graphql-codegen
 
 This will generate two json files. The `server.json` is a query id mapping to
 the actual queries which should be consumed by the server.
